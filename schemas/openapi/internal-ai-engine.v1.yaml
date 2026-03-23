@@ -1,0 +1,30 @@
+openapi: 3.1.0
+info:
+  title: Internal AI Engine API
+  version: 1.0.0
+  description: Contrato interno de generacion de contenido usado por microservicios de dominio.
+servers:
+  - url: http://ai-api:8100
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+  /generate/quiz:
+    post:
+      summary: Genera quiz estructurado
+      responses:
+        "200":
+          description: Generacion exitosa
+        "500":
+          description: Error de inferencia
+  /generate/word-pass:
+    post:
+      summary: Genera wordpass estructurado
+      responses:
+        "200":
+          description: Generacion exitosa
+        "500":
+          description: Error de inferencia

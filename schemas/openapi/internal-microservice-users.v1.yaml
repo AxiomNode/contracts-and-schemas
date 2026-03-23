@@ -1,0 +1,30 @@
+openapi: 3.1.0
+info:
+  title: Internal Microservice Users API
+  version: 1.0.0
+  description: Contrato interno para identidad, perfil y telemetria de usuario.
+servers:
+  - url: http://microservice-users:7102
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+  /users/me/profile:
+    get:
+      summary: Perfil del usuario autenticado
+      responses:
+        "200":
+          description: Perfil
+        "401":
+          description: No autorizado
+  /users/me/games/events:
+    post:
+      summary: Registra evento de juego
+      responses:
+        "201":
+          description: Evento almacenado
+        "400":
+          description: Payload invalido

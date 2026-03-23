@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "axiomnode/random-game.query.v1",
+  "title": "RandomGameQueryV1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "language": {
+      "type": "string"
+    },
+    "categoryId": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

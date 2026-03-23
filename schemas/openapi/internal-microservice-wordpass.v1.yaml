@@ -1,0 +1,32 @@
+openapi: 3.1.0
+info:
+  title: Internal Microservice Wordpass API
+  version: 1.0.0
+  description: Contrato interno consumido por bff-mobile y bff-backoffice.
+servers:
+  - url: http://microservice-wordpass:7101
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: OK
+  /games/models/random:
+    get:
+      summary: Obtiene un wordpass aleatorio
+      parameters:
+        - in: query
+          name: language
+          schema:
+            type: string
+            example: es
+        - in: query
+          name: categoryId
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Modelo de wordpass
+        "404":
+          description: Sin modelos disponibles
