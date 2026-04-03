@@ -1,10 +1,13 @@
 openapi: 3.1.0
 info:
   title: Internal AI Engine API
-  version: 1.0.0
-  description: Contrato interno de generacion de contenido usado por microservicios de dominio.
+  version: 1.1.0
+  description: Contrato interno de generacion de contenido, ingesta RAG y catalogos.
 servers:
-  - url: http://ai-api:8100
+  - url: http://ai-engine-api:7001
+    description: AI Engine API (generacion e ingesta)
+  - url: http://ai-engine-stats:7000
+    description: AI Engine Stats (observabilidad)
 paths:
   /health:
     get:
@@ -15,6 +18,23 @@ paths:
   /generate/quiz:
     post:
       summary: Genera quiz estructurado
+      parameters:
+        - in: query
+          name: language
+          schema:
+            type: string
+        - in: query
+          name: category_id
+          schema:
+            type: string
+        - in: query
+          name: difficulty
+          schema:
+            type: integer
+        - in: query
+          name: num_questions
+          schema:
+            type: integer
       responses:
         "200":
           description: Generacion exitosa
@@ -23,8 +43,102 @@ paths:
   /generate/word-pass:
     post:
       summary: Genera wordpass estructurado
+      parameters:
+        - in: query
+          name: language
+          schema:
+            type: string
+        - in: query
+          name: category_id
+          schema:
+            type: string
+        - in: query
+          name: difficulty
+          schema:
+            type: integer
+        - in: query
+          name: num_questions
+          schema:
+            type: integer
+        - in: query
+          name: letters
+          schema:
+            type: string
       responses:
         "200":
           description: Generacion exitosa
         "500":
           description: Error de inferencia
+  /ingest/quiz:
+    post:
+      summary: Ingesta de documentos RAG para quiz
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                documents:
+                  type: array
+                  items:
+                    type: object
+                    required: [content]
+                    properties:
+                      content:
+                        type: string
+                      doc_id:
+                        type: string
+                      metadata:
+                        type: object
+      responses:
+        "200":
+          description: Ingesta exitosa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ingested:
+                    type: integer
+  /ingest/word-pass:
+    post:
+      summary: Ingesta de documentos RAG para wordpass
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/paths/~1ingest~1quiz/post/requestBody/content/application~1json/schema"
+      responses:
+        "200":
+          description: Ingesta exitosa
+  /catalogs:
+    get:
+      summary: Catalogos de categorias e idiomas disponibles
+      responses:
+        "200":
+          description: Catalogos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                  languages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                        name:
+                          type: string

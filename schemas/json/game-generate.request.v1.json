@@ -13,14 +13,23 @@
       "type": "string",
       "minLength": 1
     },
-    "topic": {
-      "type": "string",
-      "minLength": 1
-    },
     "numQuestions": {
       "type": "integer",
       "minimum": 1,
-      "maximum": 20
+      "maximum": 50
+    },
+    "difficultyPercentage": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "letters": {
+      "type": "string",
+      "description": "Letter constraint for word-pass games"
+    },
+    "requestedBy": {
+      "type": "string",
+      "enum": ["api", "backoffice"]
     }
   },
   "required": ["language"]

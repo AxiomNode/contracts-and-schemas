@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Internal Microservice Wordpass API
-  version: 1.0.0
+  version: 1.1.0
   description: Contrato interno consumido por bff-mobile y bff-backoffice.
 servers:
   - url: http://microservice-wordpass:7101
@@ -14,8 +14,13 @@ paths:
           description: OK
   /games/models/random:
     get:
-      summary: Obtiene un wordpass aleatorio
+      summary: Obtiene wordpass aleatorios
       parameters:
+        - in: query
+          name: count
+          schema:
+            type: integer
+            default: 5
         - in: query
           name: language
           schema:
@@ -24,9 +29,166 @@ paths:
         - in: query
           name: categoryId
           schema:
+            type: string
+        - in: query
+          name: difficultyPercentage
+          schema:
             type: integer
       responses:
         "200":
-          description: Modelo de wordpass
+          description: Modelos de wordpass
         "404":
           description: Sin modelos disponibles
+  /games/generate:
+    post:
+      summary: Genera un wordpass individual
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [categoryId, language]
+              properties:
+                categoryId:
+                  type: string
+                language:
+                  type: string
+                difficultyPercentage:
+                  type: integer
+                numQuestions:
+                  type: integer
+                letters:
+                  type: string
+                requestedBy:
+                  type: string
+                  enum: [api, backoffice]
+      responses:
+        "200":
+          description: Wordpass generado
+        "500":
+          description: Error de generacion
+  /games/generate/process:
+    post:
+      summary: Inicia proceso de generacion batch (async)
+      responses:
+        "202":
+          description: Proceso iniciado
+  /games/generate/process/wait:
+    post:
+      summary: Genera batch esperando finalizacion
+      responses:
+        "200":
+          description: Batch completado
+  /games/generate/processes:
+    get:
+      summary: Lista procesos de generacion
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [running, completed, failed]
+        - in: query
+          name: requestedBy
+          schema:
+            type: string
+            enum: [api, backoffice]
+      responses:
+        "200":
+          description: Lista de procesos
+  /games/generate/process/{taskId}:
+    get:
+      summary: Estado de proceso especifico
+      parameters:
+        - in: path
+          name: taskId
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: includeItems
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Estado del proceso
+        "404":
+          description: Proceso no encontrado
+  /games/ingest:
+    post:
+      summary: Ingesta de documentos al RAG del AI Engine
+      responses:
+        "200":
+          description: Ingesta exitosa
+  /games/history:
+    get:
+      summary: Historial de generaciones almacenadas
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: categoryId
+          schema:
+            type: string
+        - in: query
+          name: language
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Historial
+  /games/history/manual:
+    post:
+      summary: Almacena entrada manual de curadores
+      responses:
+        "201":
+          description: Entrada creada
+  /games/history/{entryId}:
+    delete:
+      summary: Elimina entrada de historial
+      parameters:
+        - in: path
+          name: entryId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Entrada eliminada
+  /catalogs:
+    get:
+      summary: Catalogos disponibles
+      responses:
+        "200":
+          description: Catalogos
+  /monitor/stats:
+    get:
+      summary: Estadisticas de monitoreo
+      responses:
+        "200":
+          description: Stats
+  /monitor/logs:
+    get:
+      summary: Logs recientes
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Logs
+  /metrics:
+    get:
+      summary: Metricas Prometheus
+      responses:
+        "200":
+          description: Metricas en formato text/plain
