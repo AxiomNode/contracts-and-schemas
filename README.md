@@ -1,33 +1,31 @@
 # contracts-and-schemas
 
-Repositorio canonico de contratos API y esquemas de integracion.
+Canonical repository for AxiomNode API contracts and shared integration schemas.
 
-## Objetivo
+## Scope
 
-- Versionar contratos OpenAPI por dominio.
-- Centralizar JSON Schema para validacion de payloads.
-- Definir eventos y su evolucion para integraciones asincronas.
+- Versioned OpenAPI contracts for internal and edge-facing APIs.
+- Shared JSON Schema definitions for request/response validation.
+- Event schemas for asynchronous workflows.
 
-## Estructura
+## Structure
 
-- `schemas/openapi/`: contratos HTTP.
-- `schemas/json/`: esquemas de validacion.
-- `schemas/events/`: contratos de eventos.
-- `examples/`: ejemplos de uso por version.
+- `schemas/openapi/`: OpenAPI specifications.
+- `schemas/json/`: JSON schemas.
+- `schemas/events/`: event contracts.
+- `examples/`: sample payloads and usage examples.
+- `scripts/validate_contracts.py`: OpenAPI + JSON Schema validation script.
 
-## Contratos iniciales publicados
+## Main workflow
 
-- `schemas/openapi/internal-microservice-quizz.v1.yaml`
-- `schemas/openapi/internal-microservice-wordpass.v1.yaml`
-- `schemas/openapi/internal-microservice-users.v1.yaml`
-- `schemas/openapi/internal-ai-engine.v1.yaml`
+- `validate-contracts.yml`
+	- Trigger: push (`main`, `develop`), pull request, manual dispatch.
+	- Checks:
+		- required schema directories exist
+		- OpenAPI files are valid
+		- JSON schemas are valid
 
-## Objetos JSON compartidos
+## Notes
 
-- `schemas/json/game-generate.request.v1.json`
-- `schemas/json/random-game.query.v1.json`
-- `schemas/json/leaderboard.query.v1.json`
-
-## CI
-
-Incluye `validate-contracts.yml` para validar carpetas base, especificaciones OpenAPI y JSON Schema en cada push/PR.
+- This repository is a dependency for multiple CI pipelines (including `secrets` and service repos).
+- Contract updates should be coordinated with `shared-sdk-client` generation and service rollout plans.

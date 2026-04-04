@@ -1,3 +1,3 @@
 # JSON Schemas
 
-Esquemas comunes para validacion de payloads.
+Shared JSON schemas for payload validation across services and clients.

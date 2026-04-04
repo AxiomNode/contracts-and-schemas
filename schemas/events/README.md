@@ -1,3 +1,3 @@
 # Event Schemas
 
-Esquemas de eventos para integraciones asincronas.
+Event schemas for asynchronous integrations.
