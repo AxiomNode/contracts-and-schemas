@@ -12,6 +12,10 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
   /users/firebase/session:
     post:
       summary: Sincroniza sesion desde Firebase token
@@ -26,16 +30,38 @@ paths:
       responses:
         "200":
           description: Sesion sincronizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionSyncResponse"
+        "201":
+          description: Usuario creado y sesion sincronizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionSyncResponse"
         "401":
           description: Token invalido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /users/me/profile:
     get:
       summary: Perfil del usuario autenticado
       responses:
         "200":
           description: Perfil
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
         "401":
           description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /users/me/stats:
     get:
       summary: Estadisticas del usuario autenticado
@@ -48,8 +74,16 @@ paths:
       responses:
         "200":
           description: Estadisticas con juegos recientes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserStatsResponse"
         "401":
           description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /users/me/games/events:
     post:
       summary: Registra evento de juego
@@ -81,8 +115,16 @@ paths:
       responses:
         "201":
           description: Evento almacenado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StoredMessageResponse"
         "400":
           description: Payload invalido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /users/leaderboard:
     get:
       summary: Leaderboard publico
@@ -102,14 +144,26 @@ paths:
       responses:
         "200":
           description: Ranking de jugadores
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LeaderboardResponse"
   /users/admin/roles:
     get:
       summary: Lista asignaciones de roles (solo SuperAdmin)
       responses:
         "200":
           description: Lista de roles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleAssignmentsResponse"
         "403":
           description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /users/admin/roles/{firebaseUid}:
     patch:
       summary: Actualiza rol de usuario (solo SuperAdmin)
@@ -133,23 +187,229 @@ paths:
       responses:
         "200":
           description: Rol actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoleUpdateResponse"
         "403":
           description: Acceso denegado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /monitor/stats:
     get:
       summary: Estadisticas de monitoreo
       responses:
         "200":
           description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonitorStatsResponse"
   /monitor/logs:
     get:
       summary: Logs recientes
       responses:
         "200":
           description: Logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonitorLogsResponse"
   /metrics:
     get:
       summary: Metricas Prometheus
       responses:
         "200":
           description: Metricas en formato text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        service:
+          type: string
+      additionalProperties: true
+    ErrorResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        errors:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    SessionSyncResponse:
+      type: object
+      required: [message, userId, firebaseUid]
+      properties:
+        message:
+          type: string
+        userId:
+          type: string
+        firebaseUid:
+          type: string
+        provider:
+          type: string
+        role:
+          type: string
+      additionalProperties: true
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        firebaseUid:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+        photoURL:
+          type: string
+        gamesPlayed:
+          type: integer
+        bestScore:
+          type: integer
+      additionalProperties: true
+    GameSummary:
+      type: object
+      properties:
+        byGameType:
+          type: object
+          additionalProperties: true
+        byCategory:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        byLanguage:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    ProfileResponse:
+      type: object
+      required: [profile, role, gameSummary]
+      properties:
+        profile:
+          $ref: "#/components/schemas/UserProfile"
+        role:
+          type: string
+        gameSummary:
+          $ref: "#/components/schemas/GameSummary"
+      additionalProperties: true
+    UserStatsResponse:
+      type: object
+      properties:
+        profile:
+          $ref: "#/components/schemas/UserProfile"
+        recentGames:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        byGameType:
+          type: object
+          additionalProperties: true
+        byCategory:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        byLanguage:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    StoredMessageResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+      additionalProperties: true
+    LeaderboardRow:
+      type: object
+      properties:
+        firebaseUid:
+          type: string
+        displayName:
+          type: string
+        photoURL:
+          type: string
+        value:
+          type: number
+        rank:
+          type: integer
+      additionalProperties: true
+    LeaderboardResponse:
+      type: object
+      required: [metric, total, rows]
+      properties:
+        metric:
+          type: string
+        total:
+          type: integer
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeaderboardRow"
+      additionalProperties: true
+    RoleAssignment:
+      type: object
+      properties:
+        firebaseUid:
+          type: string
+        role:
+          type: string
+        displayName:
+          type: string
+        email:
+          type: string
+      additionalProperties: true
+    RoleAssignmentsResponse:
+      type: object
+      required: [total, users]
+      properties:
+        total:
+          type: integer
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoleAssignment"
+      additionalProperties: true
+    RoleUpdateResponse:
+      type: object
+      required: [message, user]
+      properties:
+        message:
+          type: string
+        user:
+          $ref: "#/components/schemas/RoleAssignment"
+      additionalProperties: true
+    MonitorStatsResponse:
+      type: object
+      additionalProperties: true
+    MonitorLogsResponse:
+      type: object
+      properties:
+        service:
+          type: string
+        total:
+          type: integer
+        logs:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true

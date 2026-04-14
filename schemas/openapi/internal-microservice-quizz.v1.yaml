@@ -12,6 +12,10 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
   /games/models/random:
     get:
       summary: Obtiene quizzes aleatorios
@@ -37,6 +41,10 @@ paths:
       responses:
         "200":
           description: Modelos de quiz
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RandomModelsResponse"
         "404":
           description: Sin modelos disponibles
   /games/generate:
@@ -62,22 +70,44 @@ paths:
                   type: string
                   enum: [api, backoffice]
       responses:
-        "200":
+        "201":
           description: Quiz generado
-        "500":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateResponse"
+        "502":
           description: Error de generacion
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "503":
+          description: Generacion temporalmente no disponible
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /games/generate/process:
     post:
       summary: Inicia proceso de generacion batch (async)
       responses:
         "202":
           description: Proceso iniciado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerationProcessResponse"
   /games/generate/process/wait:
     post:
       summary: Genera batch esperando finalizacion
       responses:
-        "200":
+        "201":
           description: Batch completado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerationProcessResponse"
   /games/generate/processes:
     get:
       summary: Lista procesos de generacion
@@ -99,6 +129,10 @@ paths:
       responses:
         "200":
           description: Lista de procesos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerationProcessListResponse"
   /games/generate/process/{taskId}:
     get:
       summary: Estado de proceso especifico
@@ -116,14 +150,22 @@ paths:
       responses:
         "200":
           description: Estado del proceso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerationProcessDetailResponse"
         "404":
           description: Proceso no encontrado
   /games/ingest:
     post:
       summary: Ingesta de documentos al RAG del AI Engine
       responses:
-        "200":
+        "202":
           description: Ingesta exitosa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestResponse"
   /games/history:
     get:
       summary: Historial de generaciones almacenadas
@@ -143,12 +185,20 @@ paths:
       responses:
         "200":
           description: Historial
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoryListResponse"
   /games/history/manual:
     post:
       summary: Almacena entrada manual de curadores
       responses:
         "201":
           description: Entrada creada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManualHistoryResponse"
   /games/history/{entryId}:
     delete:
       summary: Elimina entrada de historial
@@ -161,18 +211,30 @@ paths:
       responses:
         "200":
           description: Entrada eliminada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteHistoryResponse"
   /catalogs:
     get:
       summary: Catalogos disponibles (categorias e idiomas)
       responses:
         "200":
           description: Catalogos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogsResponse"
   /monitor/stats:
     get:
       summary: Estadisticas de monitoreo y cobertura
       responses:
         "200":
           description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonitorStatsResponse"
   /monitor/logs:
     get:
       summary: Logs recientes
@@ -184,9 +246,266 @@ paths:
       responses:
         "200":
           description: Logs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MonitorLogsResponse"
   /metrics:
     get:
       summary: Metricas Prometheus
       responses:
         "200":
           description: Metricas en formato text/plain
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        service:
+          type: string
+        gameType:
+          type: string
+      additionalProperties: true
+    ErrorResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+        errors:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    QuizModel:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        categoryId:
+          type: string
+        language:
+          type: string
+        difficultyPercentage:
+          type: integer
+        questions:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true
+    RandomModelsResponse:
+      type: object
+      required: [gameType, requested, returned, items]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        requested:
+          type: integer
+        returned:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizModel"
+      additionalProperties: true
+    GenerateResponse:
+      type: object
+      required: [gameType, generated]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        generated:
+          $ref: "#/components/schemas/QuizModel"
+      additionalProperties: true
+    GenerationTask:
+      type: object
+      properties:
+        taskId:
+          type: string
+          format: uuid
+        status:
+          type: string
+        requestedBy:
+          type: string
+        requested:
+          type: integer
+        processed:
+          type: integer
+        created:
+          type: integer
+        failed:
+          type: integer
+        progress:
+          type: number
+        message:
+          type: string
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true
+    GenerationProcessResponse:
+      type: object
+      required: [gameType, message, task]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        message:
+          type: string
+        task:
+          $ref: "#/components/schemas/GenerationTask"
+      additionalProperties: true
+    GenerationProcessListResponse:
+      type: object
+      required: [gameType, total, tasks]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        total:
+          type: integer
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/GenerationTask"
+      additionalProperties: true
+    GenerationProcessDetailResponse:
+      type: object
+      required: [gameType, task]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        task:
+          $ref: "#/components/schemas/GenerationTask"
+      additionalProperties: true
+    IngestResponse:
+      type: object
+      required: [gameType, ingested]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        ingested:
+          type: integer
+      additionalProperties: true
+    HistoryEntry:
+      type: object
+      properties:
+        id:
+          type: string
+        categoryId:
+          type: string
+        language:
+          type: string
+        difficultyPercentage:
+          type: integer
+        requestedBy:
+          type: string
+        requestJson:
+          type: object
+          additionalProperties: true
+        responseJson:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    HistoryListResponse:
+      type: object
+      required: [gameType, items]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/HistoryEntry"
+      additionalProperties: true
+    ManualHistoryResponse:
+      type: object
+      required: [gameType, item]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        item:
+          $ref: "#/components/schemas/HistoryEntry"
+      additionalProperties: true
+    DeleteHistoryResponse:
+      type: object
+      required: [gameType, deleted, id]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        deleted:
+          type: boolean
+        id:
+          type: string
+      additionalProperties: true
+    CatalogsResponse:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        languages:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true
+    CoverageStats:
+      type: object
+      properties:
+        catalogSource:
+          type: string
+        totalCategories:
+          type: integer
+        coveredCategories:
+          type: integer
+        categoryCoverageRatio:
+          type: number
+        totalLanguages:
+          type: integer
+        coveredLanguages:
+          type: integer
+        languageCoverageRatio:
+          type: number
+      additionalProperties: true
+    MonitorStatsResponse:
+      type: object
+      properties:
+        coverage:
+          $ref: "#/components/schemas/CoverageStats"
+      additionalProperties: true
+    MonitorLogsResponse:
+      type: object
+      properties:
+        service:
+          type: string
+        total:
+          type: integer
+        logs:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      additionalProperties: true

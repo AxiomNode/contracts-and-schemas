@@ -15,6 +15,10 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
   /generate/quiz:
     post:
       summary: Genera quiz estructurado
@@ -38,8 +42,16 @@ paths:
       responses:
         "200":
           description: Generacion exitosa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneratedQuizEnvelope"
         "500":
           description: Error de inferencia
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /generate/word-pass:
     post:
       summary: Genera wordpass estructurado
@@ -67,8 +79,16 @@ paths:
       responses:
         "200":
           description: Generacion exitosa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeneratedWordPassEnvelope"
         "500":
           description: Error de inferencia
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /ingest/quiz:
     post:
       summary: Ingesta de documentos RAG para quiz
@@ -97,10 +117,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  ingested:
-                    type: integer
+                $ref: "#/components/schemas/IngestResponse"
   /ingest/word-pass:
     post:
       summary: Ingesta de documentos RAG para wordpass
@@ -113,6 +130,10 @@ paths:
       responses:
         "200":
           description: Ingesta exitosa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestResponse"
   /catalogs:
     get:
       summary: Catalogos de categorias e idiomas disponibles
@@ -122,23 +143,150 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  categories:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id:
-                          type: string
-                        name:
-                          type: string
-                  languages:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        code:
-                          type: string
-                        name:
-                          type: string
+                $ref: "#/components/schemas/CatalogsResponse"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+        total_events:
+          type: integer
+        correlation_id:
+          type: string
+        distribution_version:
+          type: string
+        startup:
+          type: object
+          additionalProperties: true
+        dependencies:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    ErrorResponse:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+        error:
+          type: string
+      additionalProperties: true
+    IngestResponse:
+      type: object
+      required: [ingested]
+      properties:
+        ingested:
+          type: integer
+      additionalProperties: true
+    GeneratedQuizEnvelope:
+      type: object
+      required: [game_type, game]
+      properties:
+        game_type:
+          type: string
+          const: quiz
+        game:
+          $ref: "#/components/schemas/QuizGame"
+        metadata:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    GeneratedWordPassEnvelope:
+      type: object
+      required: [game_type, game]
+      properties:
+        game_type:
+          type: string
+          const: word-pass
+        game:
+          $ref: "#/components/schemas/WordPassGame"
+        metadata:
+          type: object
+          additionalProperties: true
+      additionalProperties: true
+    QuizGame:
+      type: object
+      properties:
+        game_type:
+          type: string
+        title:
+          type: string
+        difficulty_percentage:
+          type: integer
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuizQuestion"
+      additionalProperties: true
+    QuizQuestion:
+      type: object
+      properties:
+        question:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        correct_answer:
+          type: string
+        explanation:
+          type: string
+      additionalProperties: true
+    WordPassGame:
+      type: object
+      properties:
+        game_type:
+          type: string
+        title:
+          type: string
+        difficulty_percentage:
+          type: integer
+        words:
+          type: array
+          items:
+            $ref: "#/components/schemas/WordPassEntry"
+      additionalProperties: true
+    WordPassEntry:
+      type: object
+      properties:
+        letter:
+          type: string
+        clue:
+          type: string
+        answer:
+          type: string
+      additionalProperties: true
+    CatalogsResponse:
+      type: object
+      properties:
+        distribution_version:
+          type: string
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+        languages:
+          type: array
+          items:
+            $ref: "#/components/schemas/Language"
+      additionalProperties: true
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      additionalProperties: true
+    Language:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+      additionalProperties: true
