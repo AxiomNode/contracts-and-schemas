@@ -14,7 +14,7 @@ Canonical repository for AxiomNode API contracts and shared integration schemas.
 - `schemas/json/`: JSON schemas.
 - `schemas/events/`: event contracts.
 - `examples/`: sample payloads and usage examples.
-- `scripts/validate_contracts.py`: OpenAPI + JSON Schema validation script.
+- `scripts/validate_contracts.py`: OpenAPI + shared/event JSON Schema validation script.
 
 ## Main workflow
 
@@ -24,6 +24,7 @@ Canonical repository for AxiomNode API contracts and shared integration schemas.
 		- required schema directories exist
 		- OpenAPI files are valid
 		- JSON schemas are valid
+		- event schemas are validated when present in `schemas/events/`
 
 ## Notes
 
