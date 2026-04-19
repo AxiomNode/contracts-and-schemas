@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Internal AI Engine API
-  version: 1.1.0
+  version: 1.2.0
   description: Contrato interno de generacion de contenido, ingesta RAG y catalogos.
 servers:
   - url: http://ai-engine-api:7001
@@ -32,7 +32,11 @@ paths:
           schema:
             type: string
         - in: query
-          name: difficulty
+          name: category_name
+          schema:
+            type: string
+        - in: query
+          name: difficulty_percentage
           schema:
             type: integer
         - in: query
@@ -65,7 +69,11 @@ paths:
           schema:
             type: string
         - in: query
-          name: difficulty
+          name: category_name
+          schema:
+            type: string
+        - in: query
+          name: difficulty_percentage
           schema:
             type: integer
         - in: query
@@ -232,7 +240,10 @@ components:
           items:
             type: string
         correct_answer:
+          deprecated: true
           type: string
+        correct_index:
+          type: integer
         explanation:
           type: string
       additionalProperties: true
@@ -256,9 +267,14 @@ components:
         letter:
           type: string
         clue:
+          deprecated: true
+          type: string
+        hint:
           type: string
         answer:
           type: string
+        starts_with:
+          type: boolean
       additionalProperties: true
     CatalogsResponse:
       type: object
