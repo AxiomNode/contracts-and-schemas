@@ -77,6 +77,10 @@ paths:
           schema:
             type: integer
         - in: query
+          name: item_count
+          schema:
+            type: integer
+        - in: query
           name: num_questions
           schema:
             type: integer

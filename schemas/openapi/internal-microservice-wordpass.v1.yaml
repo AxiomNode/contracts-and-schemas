@@ -64,6 +64,8 @@ paths:
                   type: string
                 difficultyPercentage:
                   type: integer
+                itemCount:
+                  type: integer
                 numQuestions:
                   type: integer
                 letters:

@@ -17,10 +17,17 @@
       "type": "string",
       "minLength": 1
     },
+    "itemCount": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 50,
+      "description": "Canonical number of generated items requested"
+    },
     "numQuestions": {
       "type": "integer",
       "minimum": 1,
-      "maximum": 50
+      "maximum": 50,
+      "description": "Compatibility alias for itemCount"
     },
     "difficultyPercentage": {
       "type": "integer",
@@ -29,7 +36,7 @@
     },
     "letters": {
       "type": "string",
-      "description": "Letter constraint for word-pass games"
+      "description": "Deprecated legacy letter constraint for older word-pass callers"
     },
     "requestedBy": {
       "type": "string",
