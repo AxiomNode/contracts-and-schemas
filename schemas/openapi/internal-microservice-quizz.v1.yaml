@@ -26,11 +26,6 @@ paths:
             type: integer
             default: 5
         - in: query
-          name: language
-          schema:
-            type: string
-            example: es
-        - in: query
           name: categoryId
           schema:
             type: string
@@ -56,17 +51,13 @@ paths:
           application/json:
             schema:
               type: object
-              required: [categoryId, language]
+              required: [categoryId]
               properties:
                 categoryId:
-                  type: string
-                language:
                   type: string
                 difficultyPercentage:
                   type: integer
                 itemCount:
-                  type: integer
-                numQuestions:
                   type: integer
                 requestedBy:
                   type: string
@@ -180,10 +171,6 @@ paths:
           name: categoryId
           schema:
             type: string
-        - in: query
-          name: language
-          schema:
-            type: string
       responses:
         "200":
           description: Historial
@@ -219,7 +206,7 @@ paths:
                 $ref: "#/components/schemas/DeleteHistoryResponse"
   /catalogs:
     get:
-      summary: Catalogos disponibles (categorias e idiomas)
+      summary: Catalogo de categorias disponibles
       responses:
         "200":
           description: Catalogos
@@ -295,8 +282,6 @@ components:
         title:
           type: string
         categoryId:
-          type: string
-        language:
           type: string
         difficultyPercentage:
           type: integer
@@ -413,8 +398,6 @@ components:
           type: string
         categoryId:
           type: string
-        language:
-          type: string
         difficultyPercentage:
           type: integer
         requestedBy:
@@ -468,11 +451,6 @@ components:
           items:
             type: object
             additionalProperties: true
-        languages:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
       additionalProperties: true
     CoverageStats:
       type: object
@@ -484,12 +462,6 @@ components:
         coveredCategories:
           type: integer
         categoryCoverageRatio:
-          type: number
-        totalLanguages:
-          type: integer
-        coveredLanguages:
-          type: integer
-        languageCoverageRatio:
           type: number
       additionalProperties: true
     MonitorStatsResponse:

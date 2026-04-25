@@ -93,15 +93,13 @@ paths:
           application/json:
             schema:
               type: object
-              required: [gameType, language, outcome]
+              required: [gameType, outcome]
               properties:
                 gameType:
                   type: string
                 categoryId:
                   type: string
                 categoryName:
-                  type: string
-                language:
                   type: string
                 outcome:
                   type: string
@@ -294,9 +292,6 @@ components:
           items:
             type: object
             additionalProperties: true
-        byLanguage:
-          type: object
-          additionalProperties: true
       additionalProperties: true
     ProfileResponse:
       type: object
@@ -327,9 +322,6 @@ components:
           items:
             type: object
             additionalProperties: true
-        byLanguage:
-          type: object
-          additionalProperties: true
       additionalProperties: true
     StoredMessageResponse:
       type: object

@@ -5,10 +5,6 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "language": {
-      "type": "string",
-      "default": "es"
-    },
     "categoryId": {
       "type": "string",
       "minLength": 1
@@ -21,27 +17,16 @@
       "type": "integer",
       "minimum": 1,
       "maximum": 50,
-      "description": "Canonical number of generated items requested"
-    },
-    "numQuestions": {
-      "type": "integer",
-      "minimum": 1,
-      "maximum": 50,
-      "description": "Compatibility alias for itemCount"
+      "description": "Number of generated items requested"
     },
     "difficultyPercentage": {
       "type": "integer",
       "minimum": 0,
       "maximum": 100
     },
-    "letters": {
-      "type": "string",
-      "description": "Deprecated legacy letter constraint for older word-pass callers"
-    },
     "requestedBy": {
       "type": "string",
       "enum": ["api", "backoffice"]
     }
-  },
-  "required": ["language"]
+  }
 }

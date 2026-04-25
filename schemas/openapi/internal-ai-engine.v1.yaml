@@ -24,10 +24,6 @@ paths:
       summary: Genera quiz estructurado
       parameters:
         - in: query
-          name: language
-          schema:
-            type: string
-        - in: query
           name: category_id
           schema:
             type: string
@@ -61,10 +57,6 @@ paths:
       summary: Genera wordpass estructurado
       parameters:
         - in: query
-          name: language
-          schema:
-            type: string
-        - in: query
           name: category_id
           schema:
             type: string
@@ -84,10 +76,6 @@ paths:
           name: num_questions
           schema:
             type: integer
-        - in: query
-          name: letters
-          schema:
-            type: string
       responses:
         "200":
           description: Generacion exitosa
@@ -148,7 +136,7 @@ paths:
                 $ref: "#/components/schemas/IngestResponse"
   /catalogs:
     get:
-      summary: Catalogos de categorias e idiomas disponibles
+      summary: Catalogo de categorias disponibles
       responses:
         "200":
           description: Catalogos
@@ -289,23 +277,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Category"
-        languages:
-          type: array
-          items:
-            $ref: "#/components/schemas/Language"
       additionalProperties: true
     Category:
       type: object
       properties:
         id:
-          type: string
-        name:
-          type: string
-      additionalProperties: true
-    Language:
-      type: object
-      properties:
-        code:
           type: string
         name:
           type: string
