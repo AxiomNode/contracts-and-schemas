@@ -225,9 +225,18 @@ components:
     QuizQuestion:
       type: object
       properties:
+        id:
+          type: string
         question:
           type: string
+        answers:
+          type: array
+          items:
+            type: string
+        correctIndex:
+          type: integer
         options:
+          deprecated: true
           type: array
           items:
             type: string
@@ -235,6 +244,7 @@ components:
           deprecated: true
           type: string
         correct_index:
+          deprecated: true
           type: integer
         explanation:
           type: string
@@ -256,16 +266,26 @@ components:
     WordPassEntry:
       type: object
       properties:
+        id:
+          type: string
+        definition:
+          type: string
+        word:
+          type: string
         letter:
+          deprecated: true
           type: string
         clue:
           deprecated: true
           type: string
         hint:
+          deprecated: true
           type: string
         answer:
+          deprecated: true
           type: string
         starts_with:
+          deprecated: true
           type: boolean
       additionalProperties: true
     CatalogsResponse:
