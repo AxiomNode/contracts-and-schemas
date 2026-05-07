@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "game-generation-failed.v1.json",
+  "title": "GameGenerationFailed",
+  "description": "Emitted when ai-engine fails to generate a game payload.",
+  "type": "object",
+  "required": ["event_type", "event_version", "correlation_id", "timestamp", "payload"],
+  "additionalProperties": false,
+  "properties": {
+    "event_type": {
+      "type": "string",
+      "const": "game.generation.failed"
+    },
+    "event_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "correlation_id": {
+      "type": "string",
+      "description": "Request correlation ID propagated from the originating HTTP request."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC timestamp of the event."
+    },
+    "payload": {
+      "type": "object",
+      "required": ["game_type", "error_type", "distribution_version"],
+      "additionalProperties": true,
+      "properties": {
+        "game_type": {
+          "type": "string",
+          "enum": ["quiz", "word-pass", "true_false", "ingest", "unknown"],
+          "description": "Type of educational game that failed generation."
+        },
+        "error_type": {
+          "type": "string",
+          "description": "Classifier for the failure: validation_error, upstream_timeout, upstream_error, prompt_policy_violation, unknown."
+        },
+        "error_message": {
+          "type": ["string", "null"],
+          "description": "Human-readable error detail (safe to surface internally)."
+        },
+        "distribution_version": {
+          "type": "string",
+          "description": "Deployment distribution+version tag."
+        },
+        "safety_block_reason": {
+          "type": ["string", "null"],
+          "description": "Populated when the failure was caused by a safety policy block."
+        },
+        "upstream_service": {
+          "type": ["string", "null"],
+          "enum": ["llama", null],
+          "description": "The upstream service that failed, if applicable."
+        }
+      }
+    }
+  }
+}
