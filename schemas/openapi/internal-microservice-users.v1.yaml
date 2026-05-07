@@ -148,7 +148,7 @@ paths:
                 $ref: "#/components/schemas/LeaderboardResponse"
   /users/admin/roles:
     get:
-      summary: Lista asignaciones de roles (solo SuperAdmin)
+      summary: Lista asignaciones de roles (SuperAdmin o Inspector)
       responses:
         "200":
           description: Lista de roles
@@ -181,7 +181,7 @@ paths:
               properties:
                 role:
                   type: string
-                  enum: [SuperAdmin, Admin, Viewer, Gamer]
+                  enum: [SuperAdmin, Admin, Inspector, Viewer, Gamer]
       responses:
         "200":
           description: Rol actualizado

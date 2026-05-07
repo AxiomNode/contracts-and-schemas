@@ -1,6 +1,6 @@
 # contracts-and-schemas
 
-Last updated: 2026-05-03.
+Last updated: 2026-05-08.
 
 Canonical repository for AxiomNode API contracts and shared integration schemas.
 
@@ -63,6 +63,7 @@ Primary consumers include:
 
 - This repository is a dependency for multiple CI pipelines (including `secrets` and service repos).
 - Contract updates should be coordinated with `shared-sdk-client` generation and service rollout plans.
+- `internal-microservice-users.v1.yaml` defines the canonical user-role enum, currently including `SuperAdmin`, `Admin`, `Inspector`, `Viewer`, and `Gamer`.
 
 ## Documentation
 
