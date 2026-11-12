@@ -2,7 +2,15 @@ openapi: 3.1.0
 info:
   title: Internal AI Engine API
   version: 1.2.0
-  description: Contrato interno de generacion de contenido, ingesta RAG y catalogos.
+  description: >-
+    Contrato interno de generacion de contenido, ingesta RAG y catalogos.
+    PARTIAL: the routes added after 2026-11-12 (marked x-source: code-inventory) only
+    list path, method and summary, taken from the FastAPI decorators in
+    ai-engine src/ai_engine/api/app.py and src/ai_engine/observability/api.py on
+    origin/main; their request and response schemas are intentionally not documented
+    here. The /internal/* routes (include_in_schema=False in the app) are not listed.
+    Because the API (7001) and the stats app (7000) are two FastAPI apps, /health
+    exists on both; only the API one is described below.
 servers:
   - url: http://ai-engine-api:7001
     description: AI Engine API (generacion e ingesta)
@@ -144,6 +152,153 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CatalogsResponse"
+  /ready:
+    get:
+      summary: Readiness based on async bootstrap completion
+      x-source: code-inventory
+      responses:
+        "200":
+          description: OK
+  /catalogs/languages:
+    get:
+      summary: Canonical language catalog
+      x-source: code-inventory
+      responses:
+        "200":
+          description: OK
+  /catalogs/categories:
+    get:
+      summary: Canonical category catalog
+      x-source: code-inventory
+      responses:
+        "200":
+          description: OK
+  /generate:
+    post:
+      summary: Generate game content (generic; optional X-Game-Language header)
+      x-source: code-inventory
+      responses:
+        "200":
+          description: OK
+  /generate/sdk:
+    post:
+      summary: Generate game content through the SDK response model
+      x-source: code-inventory
+      responses:
+        "200":
+          description: OK
+  /generate/true-false:
+    post:
+      summary: Generate a true-false game (no service, BFF or app consumes it)
+      x-source: code-inventory
+      responses:
+        "200":
+          description: OK
+  /ingest:
+    post:
+      summary: Ingest documents into the RAG store (source query parameter)
+      x-source: code-inventory
+      responses:
+        "200":
+          description: OK
+  /ingest/true-false:
+    post:
+      summary: Ingest RAG documents for true-false
+      x-source: code-inventory
+      responses:
+        "200":
+          description: OK
+  /diagnostics/rag/stats:
+    get:
+      summary: RAG vector store health and coverage metrics
+      x-source: code-inventory
+      responses:
+        "200":
+          description: OK
+  /diagnostics/tests/run:
+    post:
+      summary: Start a hallucination and quality diagnostic test run
+      x-source: code-inventory
+      responses:
+        "200":
+          description: OK
+  /diagnostics/tests/status:
+    get:
+      summary: Current diagnostic test run status and results
+      x-source: code-inventory
+      responses:
+        "200":
+          description: OK
+  /stats:
+    get:
+      summary: Aggregate statistics over recorded events
+      x-source: code-inventory
+      servers:
+        - url: http://ai-engine-stats:7000
+          description: AI Engine Stats (observabilidad)
+      responses:
+        "200":
+          description: OK
+  /events:
+    post:
+      summary: Ingest one observability event emitted by another service
+      x-source: code-inventory
+      servers:
+        - url: http://ai-engine-stats:7000
+          description: AI Engine Stats (observabilidad)
+      responses:
+        "200":
+          description: OK
+  /stats/history:
+    get:
+      summary: Recorded event history
+      x-source: code-inventory
+      servers:
+        - url: http://ai-engine-stats:7000
+          description: AI Engine Stats (observabilidad)
+      responses:
+        "200":
+          description: OK
+  /stats/reset:
+    post:
+      summary: Clear all recorded events
+      x-source: code-inventory
+      servers:
+        - url: http://ai-engine-stats:7000
+          description: AI Engine Stats (observabilidad)
+      responses:
+        "200":
+          description: OK
+  /cache/stats:
+    get:
+      summary: Generation cache counters (proxied from the API app)
+      x-source: code-inventory
+      servers:
+        - url: http://ai-engine-stats:7000
+          description: AI Engine Stats (observabilidad)
+      responses:
+        "200":
+          description: OK
+  /cache/reset:
+    post:
+      summary: Reset the generation cache (namespace and all_namespaces query parameters)
+      x-source: code-inventory
+      servers:
+        - url: http://ai-engine-stats:7000
+          description: AI Engine Stats (observabilidad)
+      responses:
+        "200":
+          description: OK
+  /metrics:
+    get:
+      summary: Prometheus scrape-compatible metrics text
+      x-source: code-inventory
+      servers:
+        - url: http://ai-engine-stats:7000
+          description: AI Engine Stats (observabilidad)
+      responses:
+        "200":
+          description: OK
 
 components:
   schemas:

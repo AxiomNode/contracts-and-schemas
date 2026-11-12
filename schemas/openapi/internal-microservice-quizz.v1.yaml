@@ -33,6 +33,20 @@ paths:
           name: difficultyPercentage
           schema:
             type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+        - in: query
+          name: createdAfter
+          schema:
+            type: string
+            format: date-time
+        - in: query
+          name: createdBefore
+          schema:
+            type: string
+            format: date-time
       responses:
         "200":
           description: Modelos de quiz
@@ -40,8 +54,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RandomModelsResponse"
-        "404":
-          description: Sin modelos disponibles
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /games/generate:
     post:
       summary: Genera un quiz individual
@@ -168,7 +186,23 @@ paths:
           schema:
             type: integer
         - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: pageSize
+          schema:
+            type: integer
+        - in: query
           name: categoryId
+          schema:
+            type: string
+        - in: query
+          name: difficultyPercentage
+          schema:
+            type: integer
+        - in: query
+          name: status
           schema:
             type: string
       responses:
@@ -204,6 +238,96 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DeleteHistoryResponse"
+    patch:
+      summary: Update a manual history entry
+      parameters:
+        - in: path
+          name: entryId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManualHistoryUpdateRequest"
+      responses:
+        "200":
+          description: Entry updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ManualHistoryResponse"
+        "400":
+          description: Invalid payload or update failure
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Entry not found
+        "409":
+          description: Duplicate entry
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /games/models/grouped:
+    get:
+      summary: Stored models summary grouped by category
+      description: >-
+        Response also carries groupedBy [category]. Registered by the shared
+        game routes (shared-sdk-client typescript/src/game-routes.ts).
+      responses:
+        "200":
+          description: Grouped summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupedModelsResponse"
+  /games/generate/worker:
+    get:
+      summary: Runtime generation worker status
+      responses:
+        "200":
+          description: Worker snapshot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkerResponse"
+  /games/generate/worker/start:
+    post:
+      summary: Start the runtime generation worker
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkerStartRequest"
+      responses:
+        "200":
+          description: Worker snapshot after start
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkerResponse"
+        "400":
+          description: Invalid payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /games/generate/worker/stop:
+    post:
+      summary: Stop the runtime generation worker
+      responses:
+        "200":
+          description: Worker snapshot after stop
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkerResponse"
   /catalogs:
     get:
       summary: Catalogo de categorias disponibles
@@ -482,4 +606,99 @@ components:
           items:
             type: object
             additionalProperties: true
+      additionalProperties: true
+    ManualHistoryUpdateRequest:
+      type: object
+      minProperties: 1
+      properties:
+        categoryId:
+          type: string
+        difficultyPercentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+        content:
+          type: object
+          minProperties: 1
+          additionalProperties: true
+        status:
+          type: string
+          enum: [manual, validated, pending_review]
+    GroupedModelsResponse:
+      type: object
+      required: [gameType, groupedBy, categories]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        groupedBy:
+          type: array
+          items:
+            type: string
+        categories:
+          type: array
+          items:
+            type: object
+            properties:
+              categoryId:
+                type: string
+              categoryName:
+                type: string
+              total:
+                type: integer
+            additionalProperties: true
+        matrix:
+          type: array
+          items:
+            type: object
+            properties:
+              categoryId:
+                type: string
+              categoryName:
+                type: string
+              total:
+                type: integer
+            additionalProperties: true
+      additionalProperties: true
+    WorkerStartRequest:
+      type: object
+      properties:
+        countPerIteration:
+          type: integer
+          minimum: 1
+          maximum: 200
+          default: 10
+        categoryIds:
+          type: array
+          maxItems: 500
+          items:
+            type: string
+        difficultyLevels:
+          type: array
+          maxItems: 3
+          items:
+            type: string
+            enum: [easy, medium, hard]
+    WorkerResponse:
+      type: object
+      required: [gameType, worker]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        worker:
+          type: object
+          description: Runtime worker snapshot (shape defined by RuntimeGenerationWorkerSnapshot in shared-sdk-client).
+          properties:
+            active:
+              type: boolean
+            iterationInFlight:
+              type: boolean
+            intervalSeconds:
+              type: number
+            lastError:
+              type:
+                - string
+                - "null"
+          additionalProperties: true
       additionalProperties: true

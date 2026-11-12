@@ -28,9 +28,10 @@ It should not own service implementation details, deployment policy, or UI behav
 
 ### Structure
 
-- `schemas/openapi/`: OpenAPI specifications.
+- `schemas/openapi/`: OpenAPI specifications for the internal services (hand-written; see `schemas/openapi/README.md` for coverage).
+- `schemas/route-inventory/`: route inventory of api-gateway, bff-mobile and bff-backoffice, generated from code by `scripts/generate-route-inventory.mjs` (paths and methods only, not a contract).
 - `schemas/json/`: JSON schemas.
-- `schemas/events/`: event contracts.
+- `schemas/events/`: proposed event schemas. Not implemented: there is no broker and no producer or consumer (see `schemas/events/README.md`).
 - `examples/`: sample payloads and usage examples.
 - `scripts/validate_contracts.py`: OpenAPI + shared/event JSON Schema validation script.
 
@@ -62,7 +63,7 @@ Primary consumers include:
 ### Notes
 
 - This repository is a dependency for multiple CI pipelines (including `secrets` and service repos).
-- Contract updates should be coordinated with `shared-sdk-client` generation and service rollout plans.
+- Nothing generates code from these contracts today; `shared-sdk-client` is a hand-written internal TypeScript library. Contract updates should be coordinated with service rollout plans and checked against the route registrations in code.
 - `internal-microservice-users.v1.yaml` defines the canonical user-role enum, currently including `SuperAdmin`, `Admin`, `Inspector`, `Viewer`, and `Gamer`.
 
 ## Documentation
