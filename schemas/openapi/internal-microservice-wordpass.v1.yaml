@@ -54,8 +54,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RandomModelsResponse"
-        "404":
-          description: Sin modelos disponibles
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /games/generate:
     post:
       summary: Genera un wordpass individual
