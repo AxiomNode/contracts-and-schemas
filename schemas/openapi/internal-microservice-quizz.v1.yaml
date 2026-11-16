@@ -212,6 +212,44 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HistoryListResponse"
+  /games/history/insights:
+    get:
+      summary: Conteo del historial agrupado por categoria
+      description: >-
+        Server-side aggregate (GROUP BY category, no row payloads) used by the
+        Backoffice history insights. Same filters as the history list; limit,
+        page and pageSize are not part of this route. Served by the same code
+        base for both games (microservice-games, GAME_TYPE selects the game);
+        the response gameType says which one answered. bff-backoffice treats a
+        404 as "not supported" and falls back to reading history pages.
+      parameters:
+        - in: query
+          name: categoryId
+          schema:
+            type: string
+        - in: query
+          name: difficultyPercentage
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 100
+        - in: query
+          name: status
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Counts per category, newest bucket first
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HistoryInsightsResponse"
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /games/history/manual:
     post:
       summary: Almacena entrada manual de curadores
@@ -544,6 +582,34 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/HistoryEntry"
+      additionalProperties: true
+    HistoryInsightsResponse:
+      type: object
+      required: [gameType, total, categories]
+      properties:
+        gameType:
+          type: string
+          const: quiz
+        total:
+          type: integer
+          description: Sum of the counts of all categories.
+        categories:
+          type: array
+          description: Sorted by latestCreatedAt, newest first.
+          items:
+            type: object
+            required: [categoryId, categoryName, count, latestCreatedAt]
+            properties:
+              categoryId:
+                type: [string, "null"]
+              categoryName:
+                type: [string, "null"]
+              count:
+                type: integer
+              latestCreatedAt:
+                type: [string, "null"]
+                format: date-time
+                description: ISO timestamp of the newest row in the bucket.
       additionalProperties: true
     ManualHistoryResponse:
       type: object
